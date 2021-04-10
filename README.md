@@ -4,7 +4,8 @@ this is a python library for vcd wave file read.
 
 # readfile:
 ```
-    a = VcdR()
+    import pyvcdr
+    a = pyvcdr.VcdR()
     a.read_file('./test1.vcd')
 ```
 
