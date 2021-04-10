@@ -63,9 +63,13 @@ the class Signal is from pyvcd library.
 
 # any issues：
 
+I just write it for my file read. so it may not fit some IEEE 1364-2005 protocol.
+if it do not work for you,
 add an issue on github:
 https://github.com/Jiangshan00001/pyvcdr
 
+post the file that could not work.
+or you can also change the code yourself.
 
 
 
