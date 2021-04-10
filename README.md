@@ -2,11 +2,13 @@
 this is a python library for vcd wave file read.
 
 
-readfile:
+# readfile:
 ```
     a = VcdR()
     a.read_file('./test1.vcd')
 ```
+
+# use the data:
 
 after read. their are two ways to read the data.
 first is read data by signal:
@@ -35,6 +37,29 @@ second is read data by time:
         #(15000, 'D1', '1')
         #...
 ```		
+
+
+
+
+
+#why I write this code:
+
+
+
+I used this library first:
+https://github.com/westerndigitalcorporation/pyvcd
+but it could not read file. just write is supported.
+
+then this one:
+https://github.com/em-/python-vcd/tree/master/vcd
+it works, but is very very slow.
+
+
+
+info and thanks:
+the class Signal is from pyvcd library. 
+it's about 20 lines of code.
+
 
 
 
