@@ -60,9 +60,11 @@ it works, but is very very slow.
 # info and thanks:
 
 the class Signal is from pyvcd library. 
-it's about 20 lines of code.
 
+# any issues：
 
+add an issue on github:
+https://github.com/Jiangshan00001/pyvcdr
 
 
 
