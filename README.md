@@ -45,7 +45,7 @@ second is access data by time:
 
 # why I write this code:
 
-
+I need a python vcd file read program.
 
 I used this library first:
 https://github.com/westerndigitalcorporation/pyvcd
