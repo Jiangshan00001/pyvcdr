@@ -11,8 +11,8 @@ this is a python library for vcd wave file read.
 
 # use the data:
 
-after read. their are two ways to read the data.
-first is read data by signal:
+after read. their are two ways to access the data.
+first is access data by signal:
 ```	
     print(a.signals[0])#Signal(wire, 1, !, D0)
     print(a.signals[1])#Signal(wire, 1, ", D1)
@@ -25,7 +25,7 @@ first is read data by signal:
         #(6250, '1')
         #。。。
 ```
-second is read data by time:
+second is access data by time:
 ```		
     for i in a.time_values:
         print('time:', i[0], '. sig:', i[1], '. val:', i[2])
@@ -43,7 +43,7 @@ second is read data by time:
 
 
 
-#why I write this code:
+# why I write this code:
 
 
 
@@ -57,7 +57,8 @@ it works, but is very very slow.
 
 
 
-info and thanks:
+# info and thanks:
+
 the class Signal is from pyvcd library. 
 it's about 20 lines of code.
 
