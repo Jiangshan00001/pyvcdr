@@ -1,6 +1,13 @@
 # pyvcdr
 this is a python library for vcd wave file read.
 
+# install:
+```
+pip install pyvcdr
+```
+
+or just copy pyvcdr.py file to your project.
+
 
 # readfile:
 ```
