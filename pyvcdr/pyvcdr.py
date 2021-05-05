@@ -36,7 +36,11 @@ class VcdR(object):
         self.file_date = ""
         self.time_values=[]
         self.need_time_values = 1
-
+        #after $enddefinitions $end command. all data is:# time value etc...
+        self.m_is_definition_end = 0
+        self.parsed_curr_time = 0
+        self.curr_cmd = ''
+        self.curr_line=0
 
     def process_cmd(self, cmd_line):
         # find sapce or end
@@ -59,8 +63,10 @@ class VcdR(object):
             cmd_line = cmd_line.strip()
             self.file_date = cmd_line
         elif cmd == "comment":
+            self.curr_cmd = cmd
             pass
         elif cmd == "end":
+            self.curr_cmd = ''
             pass
         elif cmd == "timescale":
             cmd_line.replace('$timescale','')
@@ -77,12 +83,21 @@ class VcdR(object):
         elif cmd == 'upscope':
             pass
         elif cmd == 'enddefinitions':
+            self.m_is_definition_end=1
+        elif cmd == 'dumpvars':
             pass
+        else:
+            print('unknown cmd. may be an error:', cmd)
 
     def process_time_value(self, time_value_line):
+        time_value_line=time_value_line.strip()
         time_v = time_value_line.split(' ')
         sig_cnt = len(time_v)-1
         time_val = int(time_v[0][1:])
+        self.parsed_curr_time = time_val
+        if len(time_v) == 1:
+            return
+
         for i in time_v[1:]:
             i=i.strip()
             if i[-1] in self.sig_dict:
@@ -93,6 +108,36 @@ class VcdR(object):
                 print('unknown id error???')
                 print(i)
 
+    def process_with_last_cmd(self, curr_content):
+        if self.curr_cmd == 'comment':
+            #in comment. just skip
+            return
+        if not self.m_is_definition_end:
+            print('WARNING: i could not parse the line:',self.curr_line, curr_content)
+            print('just skip the line')
+            return
+        curr_content=curr_content.strip()
+        if len(curr_content) == 0:
+            return
+        value_vs_sig = curr_content.split(' ')
+        if len(value_vs_sig) != 2:
+            print('i could not parse the line:',self.curr_line, curr_content)
+            print('just value space signal is supported.')
+            print('if you got here. give me one example code')
+            print('https://github.com/Jiangshan00001/pyvcdr/issues')
+            return
+
+        cval = value_vs_sig[0]
+        csig = value_vs_sig[1]
+        csig=csig.strip()
+        cval=cval.strip()
+        if csig in self.sig_dict:
+            self.sig_dict[csig].step(self.parsed_curr_time, cval)
+            if self.need_time_values:
+                self.time_values.append((self.parsed_curr_time, self.sig_dict[ csig ].module, cval))
+        else:
+            print('unknown id error???')
+            print(csig)
 
 
 
@@ -105,6 +150,7 @@ class VcdR(object):
         file1.close()
         # parse every line
         for i in file_lines:
+            self.curr_line=self.curr_line+1
             i.strip()
             if len(i) == 0:
                 continue
@@ -113,7 +159,10 @@ class VcdR(object):
             elif i[0] == '$':
                 #command?
                 self.process_cmd(i)
+            else:
+                self.process_with_last_cmd(i)
 
+        #calc max min time
         for i in self.signals:
             if self.min_time == self.EMPTY_TIME:
                 self.min_time = i.min_time
@@ -125,7 +174,7 @@ class VcdR(object):
                     self.max_time = i.max_time
 
 
-if __name__=="__main__":
+def test1_vcd_parse():
     a = VcdR()
     a.read_file('./test1.vcd')
     print(a.signals[0])#Signal(wire, 1, !, D0)
@@ -148,3 +197,31 @@ if __name__=="__main__":
         #(10000, 'D1', '0')
         #(15000, 'D1', '1')
         #...
+
+def test2_vcd_parse():
+    a = VcdR()
+    a.read_file('./test2.vcd')
+    print(a.signals[0])#Signal(wire, 1, !, D0)
+    print(a.signals[1])#Signal(wire, 1, ", D1)
+    print(a.signals[2])#Signal(wire, 1, #, D2)
+    print(a.signals[1].module)#D1
+    for i in a.signals[1].steps:
+        print(i)
+        #(0, '1') time, val
+        #(1250, '0')
+        #(6250, '1')
+        #。。。
+    for i in a.time_values:
+        print('time:', i[0], '. sig:', i[1], '. val:', i[2])
+        #(0, 'D0', '0')
+        #(0, 'D1', '1')
+        #(0, 'D2', '1')
+        #(1250, 'D1', '0')
+        #(6250, 'D1', '1')
+        #(10000, 'D1', '0')
+        #(15000, 'D1', '1')
+        #...
+
+if __name__=="__main__":
+    test2_vcd_parse()
+    test1_vcd_parse()
