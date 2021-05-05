@@ -1,3 +1,4 @@
+# coding=utf-8
 
 class Signal(object):
     def __init__(self, var_type, size, reference, module):
@@ -40,7 +41,7 @@ class VcdR(object):
         self.m_is_definition_end = 0
         self.parsed_curr_time = 0
         self.curr_cmd = ''
-        self.curr_line=0
+        self.curr_line = 0
 
     def process_cmd(self, cmd_line):
         # find sapce or end
@@ -76,7 +77,7 @@ class VcdR(object):
         elif cmd == 'scope':
             pass
         elif cmd == 'var':
-            var_line = cmd_line.split(' ');
+            var_line = cmd_line.split(' ')
             sig1 = Signal(var_line[1], var_line[2], var_line[3], var_line[4])
             self.signals.append(sig1)
             self.sig_dict[var_line[3]] = sig1
@@ -186,7 +187,7 @@ def test1_vcd_parse():
         #(0, '1') time, val
         #(1250, '0')
         #(6250, '1')
-        #。。。
+        #...
     for i in a.time_values:
         print('time:', i[0], '. sig:', i[1], '. val:', i[2])
         #(0, 'D0', '0')
@@ -210,7 +211,7 @@ def test2_vcd_parse():
         #(0, '1') time, val
         #(1250, '0')
         #(6250, '1')
-        #。。。
+        #...
     for i in a.time_values:
         print('time:', i[0], '. sig:', i[1], '. val:', i[2])
         #(0, 'D0', '0')
