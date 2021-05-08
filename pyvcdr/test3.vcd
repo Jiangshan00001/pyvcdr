@@ -1,0 +1,25 @@
+$date Fri Apr 09 16:34:22 2021 $end
+$version libsigrok 0.5.1 $end
+$comment
+$end
+$timescale 1 ns $end
+$scope module libsigrok $end
+$var wire 1 ! D0 $end
+$var wire 1 " D1 $end
+$var wire 1 # D2 $end
+$upscope $end
+$enddefinitions $end
+#0
+0! B0101  "
+1 #
+#1
+ 1"
+#2
+1!
+#3
+0"
+#4
+1"
+#5
+0#
+

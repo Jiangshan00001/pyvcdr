@@ -117,7 +117,7 @@ class VcdR(object):
                 self.add_one_sig(time_val, sig_val, sig_var)
                 self.parse_elem_list(time_val, elem_list[2:])
         else:
-            print('unsupported elem:', time_val, elem_list)
+            print('unsupported elem。 line=', self.curr_line, time_val, elem_list)
 
 
     def process_time_value(self, time_value_line):
