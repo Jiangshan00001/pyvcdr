@@ -90,24 +90,51 @@ class VcdR(object):
         else:
             print('unknown cmd. may be an error:', cmd)
 
+
+    def parse_elem_list(self, time_val, elem_list):
+
+        while '' in elem_list:
+            elem_list.remove('')
+
+        if len(elem_list)==0:
+            return
+        elif elem_list[0][0] in 'BbRr':
+            #two elem needed for one
+            sig_val = elem_list[0]
+            sig_var = elem_list[1]
+            self.add_one_sig(time_val, sig_val, sig_var)
+            self.parse_elem_list(time_val, elem_list[2:])
+        elif elem_list[0][0] in '01':
+            #one elem for one
+            if len(elem_list[0])>1:
+                sig_val = elem_list[0][0]
+                sig_var = elem_list[0][1:]
+                self.add_one_sig(time_val, sig_val, sig_var)
+                self.parse_elem_list(time_val, elem_list[1:])
+            else:
+                sig_val = elem_list[0]
+                sig_var = elem_list[1]
+                self.add_one_sig(time_val, sig_val, sig_var)
+                self.parse_elem_list(time_val, elem_list[2:])
+        else:
+            print('unsupported elem:', time_val, elem_list)
+
+
     def process_time_value(self, time_value_line):
         time_value_line=time_value_line.strip()
         time_v = time_value_line.split(' ')
-        sig_cnt = len(time_v)-1
         time_val = int(time_v[0][1:])
         self.parsed_curr_time = time_val
-        if len(time_v) == 1:
-            return
+        self.parse_elem_list(self.parsed_curr_time, time_v[1:])
 
-        for i in time_v[1:]:
-            i=i.strip()
-            if i[-1] in self.sig_dict:
-                self.sig_dict[ i[-1] ].step(time_val, i[0:-1])
-                if self.need_time_values:
-                    self.time_values.append((time_val, self.sig_dict[ i[-1] ].module, i[0:-1]))
-            else:
-                print('unknown id error???')
-                print(i)
+    def add_one_sig(self, ctime, cval, csig):
+        if csig in self.sig_dict:
+            self.sig_dict[csig].step(ctime, cval)
+            if self.need_time_values:
+                self.time_values.append((ctime, self.sig_dict[csig].module, cval))
+        else:
+            print('unknown id error. line=', self.curr_line, ctime, cval, csig)
+
 
     def process_with_last_cmd(self, curr_content):
         if self.curr_cmd == 'comment':
@@ -121,27 +148,7 @@ class VcdR(object):
         if len(curr_content) == 0:
             return
         value_vs_sig = curr_content.split(' ')
-        if len(value_vs_sig) != 2:
-            print('i could not parse the line:',self.curr_line, curr_content)
-            print('just value space signal is supported.')
-            print('if you got here. give me one example code')
-            print('https://github.com/Jiangshan00001/pyvcdr/issues')
-            return
-
-        cval = value_vs_sig[0]
-        csig = value_vs_sig[1]
-        csig=csig.strip()
-        cval=cval.strip()
-        if csig in self.sig_dict:
-            self.sig_dict[csig].step(self.parsed_curr_time, cval)
-            if self.need_time_values:
-                self.time_values.append((self.parsed_curr_time, self.sig_dict[ csig ].module, cval))
-        else:
-            print('unknown id error???')
-            print(csig)
-
-
-
+        self.parse_elem_list(self.parsed_curr_time, value_vs_sig)
 
 
     def read_file(self, file_name):
@@ -149,9 +156,10 @@ class VcdR(object):
         file1 = open(file_name)
         file_lines = file1.readlines()
         file1.close()
+        self.curr_line = 0
         # parse every line
         for i in file_lines:
-            self.curr_line=self.curr_line+1
+            self.curr_line = self.curr_line+1
             i.strip()
             if len(i) == 0:
                 continue
@@ -223,6 +231,21 @@ def test2_vcd_parse():
         #(15000, 'D1', '1')
         #...
 
+
+def test3_vcd_parse():
+    a = VcdR()
+    a.read_file('./test3.vcd')
+    print(a.signals[0])#Signal(wire, 1, !, D0)
+    print(a.signals[1])#Signal(wire, 1, ", D1)
+    print(a.signals[2])#Signal(wire, 1, #, D2)
+    print(a.signals[1].module)#D1
+    for i in a.signals[1].steps:
+        print(i)
+
+    for i in a.time_values:
+        print('time:', i[0], '. sig:', i[1], '. val:', i[2])
+
 if __name__=="__main__":
+    test3_vcd_parse()
     test2_vcd_parse()
     test1_vcd_parse()
