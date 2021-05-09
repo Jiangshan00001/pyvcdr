@@ -67,6 +67,7 @@ it works, but is very very slow.
 # info and thanks:
 
 the class Signal is from pyvcd library. 
+import error fix and pep8 sytle fix by @EtlamGit
 
 # any issues：
 
@@ -78,9 +79,10 @@ https://github.com/Jiangshan00001/pyvcdr
 post the file that could not work.
 or you can also change the code yourself.
 
-CHANGE:
-V0.7 2021.5.9 BUG FIX: import error fix and pep8 sytle fix. thanks to @EtlamGit. 
-V0.6 2021.5.8. add suport for bBrR data support.
+# CHANGE:
+
+- V0.7 2021.5.9 BUG FIX: import error fix and pep8 sytle fix. thanks to @EtlamGit. 
+- V0.6 2021.5.8. add suport for bBrR data support.
 
 
 
