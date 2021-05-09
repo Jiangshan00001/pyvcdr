@@ -7,37 +7,39 @@ class Signal(object):
         self.reference = reference
         self.module = module
         self.steps = []
-        self.EMPTY_TIME=-1.23456789
+        self.EMPTY_TIME = -1.23456789
         self.max_time = self.EMPTY_TIME
-        self.min_time=self.EMPTY_TIME
+        self.min_time = self.EMPTY_TIME
 
     def step(self, time, value):
         self.steps.append((time, value))
-        if self.max_time==self.EMPTY_TIME:
+        if self.max_time == self.EMPTY_TIME:
             self.max_time = int(time)
             self.min_time = int(time)
         else:
             ct = int(time)
-            if(ct<self.min_time):
+            if(ct < self.min_time):
                 self.min_time = ct
-            if(ct>self.max_time):
+            if(ct > self.max_time):
                 self.max_time = ct
+
     def __str__(self):
         return "Signal(%s, %s, %s, %s)" % (self.type, self.size, self.reference, self.module)
 
 
 class VcdR(object):
+
     def __init__(self):
-        self.EMPTY_TIME=-1.23456789
-        self.signals=[]
+        self.EMPTY_TIME = -1.23456789
+        self.signals = []
         self.sig_dict = {}
         self.max_time = self.EMPTY_TIME
-        self.min_time=self.EMPTY_TIME
+        self.min_time = self.EMPTY_TIME
         self.timescale = ''
         self.file_date = ""
-        self.time_values=[]
+        self.time_values = []
         self.need_time_values = 1
-        #after $enddefinitions $end command. all data is:# time value etc...
+        # after $enddefinitions $end command. all data is:# time value etc...
         self.m_is_definition_end = 0
         self.parsed_curr_time = 0
         self.curr_cmd = ''
@@ -54,13 +56,13 @@ class VcdR(object):
         cmd = cmd_line[1:space_index]
         cmd.strip()
         if cmd == "date":
-            cmd_line.replace('$date','')
-            cmd_line.replace('$end', '') #date must end with one line
+            cmd_line.replace('$date', '')
+            cmd_line.replace('$end', '')  # date must end with one line
             cmd_line = cmd_line.strip()
             self.file_date = cmd_line
         elif cmd == 'version':
-            cmd_line.replace('$version','')
-            cmd_line.replace('$end', '') #date must end with one line
+            cmd_line.replace('$version', '')
+            cmd_line.replace('$end', '')  # date must end with one line
             cmd_line = cmd_line.strip()
             self.file_date = cmd_line
         elif cmd == "comment":
@@ -70,8 +72,8 @@ class VcdR(object):
             self.curr_cmd = ''
             pass
         elif cmd == "timescale":
-            cmd_line.replace('$timescale','')
-            cmd_line.replace('$end', '') #date must end with one line
+            cmd_line.replace('$timescale', '')
+            cmd_line.replace('$end', '')  # date must end with one line
             cmd_line = cmd_line.strip()
             self.timescale = cmd_line
         elif cmd == 'scope':
@@ -84,29 +86,27 @@ class VcdR(object):
         elif cmd == 'upscope':
             pass
         elif cmd == 'enddefinitions':
-            self.m_is_definition_end=1
+            self.m_is_definition_end = 1
         elif cmd == 'dumpvars':
             pass
         else:
             print('unknown cmd. may be an error:', cmd)
 
-
     def parse_elem_list(self, time_val, elem_list):
-
         while '' in elem_list:
             elem_list.remove('')
 
-        if len(elem_list)==0:
+        if len(elem_list) == 0:
             return
         elif elem_list[0][0] in 'BbRr':
-            #two elem needed for one
+            # two elem needed for one
             sig_val = elem_list[0]
             sig_var = elem_list[1]
             self.add_one_sig(time_val, sig_val, sig_var)
             self.parse_elem_list(time_val, elem_list[2:])
         elif elem_list[0][0] in '01':
-            #one elem for one
-            if len(elem_list[0])>1:
+            # one elem for one
+            if len(elem_list[0]) > 1:
                 sig_val = elem_list[0][0]
                 sig_var = elem_list[0][1:]
                 self.add_one_sig(time_val, sig_val, sig_var)
@@ -119,9 +119,8 @@ class VcdR(object):
         else:
             print('unsupported elem。 line=', self.curr_line, time_val, elem_list)
 
-
     def process_time_value(self, time_value_line):
-        time_value_line=time_value_line.strip()
+        time_value_line = time_value_line.strip()
         time_v = time_value_line.split(' ')
         time_val = int(time_v[0][1:])
         self.parsed_curr_time = time_val
@@ -135,24 +134,22 @@ class VcdR(object):
         else:
             print('unknown id error. line=', self.curr_line, ctime, cval, csig)
 
-
     def process_with_last_cmd(self, curr_content):
         if self.curr_cmd == 'comment':
-            #in comment. just skip
+            # in comment. just skip
             return
         if not self.m_is_definition_end:
-            print('WARNING: i could not parse the line:',self.curr_line, curr_content)
+            print('WARNING: i could not parse the line:', self.curr_line, curr_content)
             print('just skip the line')
             return
-        curr_content=curr_content.strip()
+        curr_content = curr_content.strip()
         if len(curr_content) == 0:
             return
         value_vs_sig = curr_content.split(' ')
         self.parse_elem_list(self.parsed_curr_time, value_vs_sig)
 
-
     def read_file(self, file_name):
-        #read all file
+        # read all file
         file1 = open(file_name)
         file_lines = file1.readlines()
         file1.close()
@@ -166,86 +163,88 @@ class VcdR(object):
             if i[0] == '#':
                 self.process_time_value(i)
             elif i[0] == '$':
-                #command?
+                # command?
                 self.process_cmd(i)
             else:
                 self.process_with_last_cmd(i)
 
-        #calc max min time
+        # calc max min time
         for i in self.signals:
             if self.min_time == self.EMPTY_TIME:
                 self.min_time = i.min_time
                 self.max_time = i.max_time
             else:
-                if self.min_time>i.min_time:
+                if self.min_time > i.min_time:
                     self.min_time = i.min_time
-                if self.max_time<i.max_time:
+                if self.max_time < i.max_time:
                     self.max_time = i.max_time
 
 
 def test1_vcd_parse():
     a = VcdR()
     a.read_file('./test1.vcd')
-    print(a.signals[0])#Signal(wire, 1, !, D0)
-    print(a.signals[1])#Signal(wire, 1, ", D1)
-    print(a.signals[2])#Signal(wire, 1, #, D2)
-    print(a.signals[1].module)#D1
+    print(a.signals[0])  # Signal(wire, 1, !, D0)
+    print(a.signals[1])  # Signal(wire, 1, ", D1)
+    print(a.signals[2])  # Signal(wire, 1, #, D2)
+    print(a.signals[1].module)  # D1
     for i in a.signals[1].steps:
         print(i)
-        #(0, '1') time, val
-        #(1250, '0')
-        #(6250, '1')
-        #...
+        # (0, '1') time, val
+        # (1250, '0')
+        # (6250, '1')
+        # ...
     for i in a.time_values:
         print('time:', i[0], '. sig:', i[1], '. val:', i[2])
-        #(0, 'D0', '0')
-        #(0, 'D1', '1')
-        #(0, 'D2', '1')
-        #(1250, 'D1', '0')
-        #(6250, 'D1', '1')
-        #(10000, 'D1', '0')
-        #(15000, 'D1', '1')
-        #...
+        # (0, 'D0', '0')
+        # (0, 'D1', '1')
+        # (0, 'D2', '1')
+        # (1250, 'D1', '0')
+        # (6250, 'D1', '1')
+        # (10000, 'D1', '0')
+        # (15000, 'D1', '1')
+        # ...
+
 
 def test2_vcd_parse():
     a = VcdR()
     a.read_file('./test2.vcd')
-    print(a.signals[0])#Signal(wire, 1, !, D0)
-    print(a.signals[1])#Signal(wire, 1, ", D1)
-    print(a.signals[2])#Signal(wire, 1, #, D2)
-    print(a.signals[1].module)#D1
+    print(a.signals[0])  # Signal(wire, 1, !, D0)
+    print(a.signals[1])  # Signal(wire, 1, ", D1)
+    print(a.signals[2])  # Signal(wire, 1, #, D2)
+    print(a.signals[1].module)  # D1
     for i in a.signals[1].steps:
         print(i)
-        #(0, '1') time, val
-        #(1250, '0')
-        #(6250, '1')
-        #...
+        # (0, '1') time, val
+        # (1250, '0')
+        # (6250, '1')
+        # ...
     for i in a.time_values:
         print('time:', i[0], '. sig:', i[1], '. val:', i[2])
-        #(0, 'D0', '0')
-        #(0, 'D1', '1')
-        #(0, 'D2', '1')
-        #(1250, 'D1', '0')
-        #(6250, 'D1', '1')
-        #(10000, 'D1', '0')
-        #(15000, 'D1', '1')
-        #...
+        # (0, 'D0', '0')
+        # (0, 'D1', '1')
+        # (0, 'D2', '1')
+        # (1250, 'D1', '0')
+        # (6250, 'D1', '1')
+        # (10000, 'D1', '0')
+        # (15000, 'D1', '1')
+        # ...
 
 
 def test3_vcd_parse():
     a = VcdR()
     a.read_file('./test3.vcd')
-    print(a.signals[0])#Signal(wire, 1, !, D0)
-    print(a.signals[1])#Signal(wire, 1, ", D1)
-    print(a.signals[2])#Signal(wire, 1, #, D2)
-    print(a.signals[1].module)#D1
+    print(a.signals[0])  # Signal(wire, 1, !, D0)
+    print(a.signals[1])  # Signal(wire, 1, ", D1)
+    print(a.signals[2])  # Signal(wire, 1, #, D2)
+    print(a.signals[1].module)  # D1
     for i in a.signals[1].steps:
         print(i)
 
     for i in a.time_values:
         print('time:', i[0], '. sig:', i[1], '. val:', i[2])
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     test3_vcd_parse()
     test2_vcd_parse()
     test1_vcd_parse()
