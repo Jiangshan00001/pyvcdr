@@ -66,8 +66,8 @@ it works, but is very very slow.
 
 # info and thanks:
 
-the class Signal is from pyvcd library. 
-import error fix and pep8 sytle fix by @EtlamGit
+- the class Signal is from pyvcd library. 
+- import error fix and pep8 sytle fix by @EtlamGit
 
 # any issues：
 
