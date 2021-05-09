@@ -2,4 +2,7 @@
 .idea/*
 build/*
 dist/*
-temp_tes_.txt
+pyvcdr.egg-info/*
+temp_test.txt
+tmp.py
+pyvcdr/__pycache__/*
