@@ -148,15 +148,14 @@ class VcdR(object):
         value_vs_sig = curr_content.split(' ')
         self.parse_elem_list(self.parsed_curr_time, value_vs_sig)
 
-    def read_file(self, file_name):
-        # read all file
-        file1 = open(file_name)
-        file_lines = file1.readlines()
-        file1.close()
+    def parse_str(self, vcd_str):
+        # read all str
+        file_lines = vcd_str.split('\n')
+
         self.curr_line = 0
         # parse every line
         for i in file_lines:
-            self.curr_line = self.curr_line+1
+            self.curr_line = self.curr_line + 1
             i.strip()
             if len(i) == 0:
                 continue
@@ -178,6 +177,13 @@ class VcdR(object):
                     self.min_time = i.min_time
                 if self.max_time < i.max_time:
                     self.max_time = i.max_time
+
+    def read_file(self, file_name):
+        # read all file
+        file1 = open(file_name)
+        file_lines = file1.read()
+        file1.close()
+        self.parse_str(file_lines)
 
 
 def test1_vcd_parse():

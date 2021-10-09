@@ -16,6 +16,15 @@ or just copy pyvcdr.py file to your project.
     a.read_file('./test1.vcd')
 ```
 
+# read from str:
+```
+    import pyvcdr
+    a = pyvcdr.VcdR()
+    a.parse_str('$var wire 1 ! D0 $end\n#0 0!\n')
+```
+
+
+
 # use the data:
 
 after read. their are two ways to access the data.
