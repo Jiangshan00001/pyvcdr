@@ -52,6 +52,8 @@ class VcdR(object):
             space_index = cmd_line.find('\n')
         if space_index == -1:
             space_index = cmd_line.find('\r')
+        if space_index == -1:
+            space_index = len(cmd_line)
 
         cmd = cmd_line[1:space_index]
         cmd.strip()
