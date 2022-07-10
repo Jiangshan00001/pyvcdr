@@ -7,7 +7,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
 	
 setuptools.setup(
     name="pyvcdr",
-    version="0.0.8",
+    version="0.0.9",
     author="jiangshan00000",
     author_email="710806594@qq.com",
     description="A vcd wave file read library",
